@@ -234,11 +234,18 @@ class BodyMapInterface(CTkFrame):
         self.set_injury_area_label()
 
     # retrieves button of a given index in constant time
+    # TODO
     def get_button(self, index):
         for location, index_range in body_map_data.body_part_range_dict.items():
             if index_range[0] <= index <= index_range[1]:
-                pass
-                # return the button so you can do shit to it?
+                start_index = index_range[0]
+                # retrieve the associated body map
+                body_part = location
+                body_frame: AbstractBodyFrame = self.body_maps_dict[body_part]
+                # need to calculate what index in the body frame's list the button with assigned index "index" will be
+                relative_index = index - start_index
+                return body_frame.get_button(relative_index)
+
 
     def calculate_injury_coverage(self):
         # use the values given in the original study to estimate surface area of injury coverage
@@ -278,8 +285,6 @@ class BodyMapInterface(CTkFrame):
             self.staged_locations.clear()
             self.set_staged_locations_label()
             self.set_injury_area_label()
-
-            # TODO: add to injury display
             self.update_injury_display()
 
     def update_injury_display(self):
@@ -288,10 +293,49 @@ class BodyMapInterface(CTkFrame):
             card.destroy()
         # maybe update entire display based on what's in the injury record?
         for injury in self.record.injury_list:
-            InjuryDisplayCard(master=self.injury_display, injury=injury).pack(padx=5, pady=5, fill=X, expand=False)
+            (InjuryDisplayCard(master=self.injury_display,
+                              injury=injury,
+                              delete_callback=self.delete_injury_card,
+                              edit_callback=self.edit_injury)
+             .pack(padx=5, pady=5, fill=X, expand=False))
 
-    def draw_injury(self, injury):
-        # given a recorded injury, show it on the GUI
+    def delete_injury_card(self, injury_card: InjuryDisplayCard):
+        # extract needed info from injury
+        injury_to_delete: InjuryRecord.Injury = injury_card.injury
+        injury_to_delete_id = injury_to_delete.id
+        injury_to_delete_indices = injury_to_delete.indices
+        injury_to_delete_type = injury_to_delete.type
+        injury_to_delete_locations = injury_to_delete.locations
+
+        # for now, selecting indices to remove
+        # deselect everything first
+
+        self.staged_injury_indices.clear()
+        self.staged_locations.clear()
+        self.set_staged_locations_label()
+        self.set_injury_area_label()
+
+        # update indices and locations
+        for index in injury_to_delete_indices:
+            # need to retrieve the button to toggle select on it
+            self.get_button(index).toggle_select()
+            self.stage_injury(index)
+
+        # delete injury from gui
+        for body_map in self.staged_locations:
+            self.body_maps_dict[body_map].remove_injuries_deselect_body_map(injury_to_delete_type)
+
+        # extract id, delete injury from record
+        self.record.remove_injury(injury_to_delete_id)
+
+        # update display to reflect changes
+        self.update_injury_display()
+        self.staged_injury_indices.clear()
+        self.staged_locations.clear()
+        self.set_staged_locations_label()
+        self.set_injury_area_label()
+
+    def edit_injury(self, injury):
         pass
 
     # places the chosen body map

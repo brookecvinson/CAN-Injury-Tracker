@@ -79,7 +79,7 @@ class CustomInjuryButton(InjuryButton):
                 self.unselected_fg_color = colors.BUTTON_COLOR_DICT["unselected"][1]
             else:
                 self.unselected_fg_color = colors.BUTTON_COLOR_DICT["unselected"][2]
-            self.unselected_fg_color = colors.BLUE
+            # self.unselected_fg_color = colors.BLUE
         else:
             self.unselected_hover_color = colors.BUTTON_COLOR_DICT[injury_type][0]
             if self.color_bit == 0:

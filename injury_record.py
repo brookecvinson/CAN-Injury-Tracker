@@ -30,26 +30,17 @@ class InjuryRecord:
 
     class Injury:
         def __init__(self, injury_id, injury_type, indices, locations, area, note):
-            # identifies the injury
             self.id = injury_id
-            # e.g., bruise, open wound, etc.
             self.type = injury_type
-            self.indices = indices
-            # locations of an injury: e.g., arms, head, etc.
-            self.locations = locations
+            self.indices = set(indices)  # Ensure it's a set
+            self.locations = list(locations)  # Ensure it's a list copy
             self.area = area
-            self.note = note
-            if self.note == "":
-                self.note = "None"
+            self.note = note if note else "None"
 
-        def edit(self):
-            pass
-
-        def get_locations_string(self):
-            locations_string = ""
-            for location in self.locations:
-                locations_string += f"{location}, "
-            return locations_string[:-2]
+            # Debug prints
+            print(f"Created Injury {self.id}:")
+            print(f"  Locations: {self.locations}")
+            print(f"  Indices: {self.indices}")
 
         def print_injury(self):
             print(f"Injury {self.id}:")
@@ -57,6 +48,9 @@ class InjuryRecord:
             print(f"Indices: {self.indices}")
             print(f"Area: {self.area}")
             print("*" * 30)
+
+        def get_locations_string(self):
+            return ", ".join(self.locations) if self.locations else "None"
 
     # injury record methods
 
@@ -68,6 +62,16 @@ class InjuryRecord:
         # increment ID
         self.next_injury_id += 1
         # self.print_injuries()
+
+    def remove_injury(self, injury_id):
+        """Removes an injury by ID and confirms if successful."""
+        initial_length = len(self.injury_list)
+        self.injury_list = [injury for injury in self.injury_list if injury.id != injury_id]
+
+        if len(self.injury_list) < initial_length:
+            print(f"Injury {injury_id} removed.")
+        else:
+            print(f"No injury found with ID {injury_id}.")
 
     # for testing
     def print_injuries(self):

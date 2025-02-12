@@ -30,6 +30,11 @@ class AbstractBodyMap(CTkFrame):
             if button.selected:
                 button.toggle_select()
 
+    def get_button(self, calculated_index):
+        if calculated_index < len(self.button_list):
+            return self.button_list[calculated_index]
+        return None
+
     def add_injury_and_deselect_buttons(self, injury_type):
         for button in self.button_list:
             if button.selected:
@@ -157,7 +162,15 @@ class AbstractBodyFrame(CTkFrame):
         pass
 
     @abstractmethod
+    def remove_injuries_deselect_body_map(self, injury_type):
+        pass
+
+    @abstractmethod
     def get_map_selected_area(self, button_size):
+        pass
+
+    @abstractmethod
+    def get_button(self, calculated_index):
         pass
 
 
@@ -176,8 +189,14 @@ class SimpleBodyFrame(AbstractBodyFrame):
     def add_injuries_deselect_body_map(self, injury_type):
         self.body_map.add_injury_and_deselect_buttons(injury_type)
 
+    def remove_injuries_deselect_body_map(self, injury_type):
+        self.body_map.remove_injury_buttons(injury_type)
+
     def get_map_selected_area(self, button_size):
         return self.body_map.get_selected_area(button_size)
+
+    def get_button(self, calculated_index):
+        return self.body_map.get_button(calculated_index)
 
 
 class DoubleBodyFrame(AbstractBodyFrame):
@@ -201,6 +220,17 @@ class DoubleBodyFrame(AbstractBodyFrame):
     def add_injuries_deselect_body_map(self, injury_type):
         self.left_body_map.add_injury_and_deselect_buttons(injury_type)
         self.right_body_map.add_injury_and_deselect_buttons(injury_type)
+
+    def remove_injuries_deselect_body_map(self, injury_type):
+        self.left_body_map.remove_injury_buttons(injury_type)
+        self.right_body_map.remove_injury_buttons(injury_type)
+
+    def get_button(self, calculated_index):
+        button = self.left_body_map.get_button(calculated_index)
+        if button is None:
+            new_index = calculated_index - len(self.left_body_map.button_list)
+            button = self.right_body_map.get_button(new_index)
+        return button
 
     def get_map_selected_area(self, button_size):
         return self.left_body_map.get_selected_area(button_size) + self.right_body_map.get_selected_area(button_size)
@@ -229,6 +259,17 @@ class MirroredDoubleBodyFrame(AbstractBodyFrame):
         self.left_body_map.add_injury_and_deselect_buttons(injury_type)
         self.right_body_map.add_injury_and_deselect_buttons(injury_type)
 
+    def remove_injuries_deselect_body_map(self, injury_type):
+        self.left_body_map.remove_injury_buttons(injury_type)
+        self.right_body_map.remove_injury_buttons(injury_type)
+
+    def get_button(self, calculated_index):
+        button = self.left_body_map.get_button(calculated_index)
+        if button is None:
+            new_index = calculated_index - len(self.left_body_map.button_list)
+            button = self.right_body_map.get_button(new_index)
+        return button
+
     def get_map_selected_area(self, button_size):
         return self.left_body_map.get_selected_area(button_size) + self.right_body_map.get_selected_area(button_size)
 
@@ -245,6 +286,12 @@ class CustomBodyFrame(AbstractBodyFrame):
 
     def add_injuries_deselect_body_map(self, injury_type):
         self.body_map.add_injury_and_deselect_buttons(injury_type)
+
+    def remove_injuries_deselect_body_map(self, injury_type):
+        self.body_map.remove_injury_buttons(injury_type)
+
+    def get_button(self, calculated_index):
+        return self.body_map.get_button(calculated_index)
 
     def get_map_selected_area(self, button_size):
         return self.body_map.get_selected_area(button_size)

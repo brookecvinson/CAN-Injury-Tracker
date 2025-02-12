@@ -5,12 +5,15 @@ from colors import *
 
 
 class InjuryDisplayCard(CTkFrame):
-    def __init__(self, master, injury):
+    def __init__(self, master, injury, delete_callback, edit_callback):
         super().__init__(master=master, height=100)
 
         print(injury.get_locations_string())
         print(injury.locations)
         print(injury.area)
+
+        self.injury = injury
+        self.locations = injury.get_locations_string()
 
         # inner frames
         self.frame1 = CTkFrame(master=self, fg_color="transparent", height=32)
@@ -22,7 +25,7 @@ class InjuryDisplayCard(CTkFrame):
         self.area_label = CTkLabel(master=self,
                                    text=f"Area: {injury.area} cm²")
         self.locations_label = CTkLabel(master=self,
-                                        text=f"Location(s): {injury.get_locations_string()}")
+                                        text=f"Location(s): {self.locations}")
         self.edit_button = CTkButton(master=self.frame2,
                                      text="Edit Injury",
                                      fg_color=colors.GREEN,
@@ -32,7 +35,7 @@ class InjuryDisplayCard(CTkFrame):
                                        text="Delete Injury",
                                        fg_color=colors.MAROON,
                                        hover_color=colors.DARK_MAROON,
-                                       command=self.delete_button_callback)
+                                       command=lambda : delete_callback(self))
 
         # placing widgets
 
