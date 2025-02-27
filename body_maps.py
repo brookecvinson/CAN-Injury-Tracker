@@ -48,6 +48,11 @@ class AbstractBodyMap(CTkFrame):
                 button.toggle_select()
         # TODO: make this work with however deleting injuries ends up being handled
 
+    def remove_injury_buttons_select(self, injury_type):
+        for button in self.button_list:
+            if button.selected:
+                button.remove_injury(injury_type)
+
     def place_buttons(self, width, height):
         for button in self.button_list:
             button.place(relx=button.col / width, rely=button.row / height, relwidth=1 / width,
@@ -166,6 +171,10 @@ class AbstractBodyFrame(CTkFrame):
         pass
 
     @abstractmethod
+    def remove_injuries(self, injury_type):
+        pass
+
+    @abstractmethod
     def get_map_selected_area(self, button_size):
         pass
 
@@ -191,6 +200,9 @@ class SimpleBodyFrame(AbstractBodyFrame):
 
     def remove_injuries_deselect_body_map(self, injury_type):
         self.body_map.remove_injury_buttons(injury_type)
+
+    def remove_injuries(self, injury_type):
+        self.body_map.remove_injury_buttons_select(injury_type)
 
     def get_map_selected_area(self, button_size):
         return self.body_map.get_selected_area(button_size)
@@ -224,6 +236,10 @@ class DoubleBodyFrame(AbstractBodyFrame):
     def remove_injuries_deselect_body_map(self, injury_type):
         self.left_body_map.remove_injury_buttons(injury_type)
         self.right_body_map.remove_injury_buttons(injury_type)
+
+    def remove_injuries(self, injury_type):
+        self.left_body_map.remove_injury_buttons_select(injury_type)
+        self.right_body_map.remove_injury_buttons_select(injury_type)
 
     def get_button(self, calculated_index):
         button = self.left_body_map.get_button(calculated_index)
@@ -263,6 +279,10 @@ class MirroredDoubleBodyFrame(AbstractBodyFrame):
         self.left_body_map.remove_injury_buttons(injury_type)
         self.right_body_map.remove_injury_buttons(injury_type)
 
+    def remove_injuries(self, injury_type):
+        self.left_body_map.remove_injury_buttons_select(injury_type)
+        self.right_body_map.remove_injury_buttons_select(injury_type)
+
     def get_button(self, calculated_index):
         button = self.left_body_map.get_button(calculated_index)
         if button is None:
@@ -289,6 +309,9 @@ class CustomBodyFrame(AbstractBodyFrame):
 
     def remove_injuries_deselect_body_map(self, injury_type):
         self.body_map.remove_injury_buttons(injury_type)
+
+    def remove_injuries(self, injury_type):
+        self.body_map.remove_injury_buttons_select(injury_type)
 
     def get_button(self, calculated_index):
         return self.body_map.get_button(calculated_index)

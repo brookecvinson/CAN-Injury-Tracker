@@ -77,8 +77,7 @@ class BodyMapInterface(CTkFrame):
                                               command=self.record_injury, state="disabled")
         self.injury_error_label = CTkLabel(master=self.injury_edit_frame, text="")
 
-
-########################################################################################################################
+        ########################################################################################################################
         # THE INJURY DISPLAY
 
         self.injury_display_frame = CTkFrame(master=self, fg_color="transparent")
@@ -246,7 +245,6 @@ class BodyMapInterface(CTkFrame):
                 relative_index = index - start_index
                 return body_frame.get_button(relative_index)
 
-
     def calculate_injury_coverage(self):
         # use the values given in the original study to estimate surface area of injury coverage
         injury_coverage = 0
@@ -294,13 +292,103 @@ class BodyMapInterface(CTkFrame):
         # maybe update entire display based on what's in the injury record?
         for injury in self.record.injury_list:
             (InjuryDisplayCard(master=self.injury_display,
-                              injury=injury,
-                              delete_callback=self.delete_injury_card,
-                              edit_callback=self.edit_injury)
+                               injury=injury,
+                               delete_callback=self.delete_injury_card,
+                               edit_callback=self.edit_injury)
              .pack(padx=5, pady=5, fill=X, expand=False))
 
     def delete_injury_card(self, injury_card: InjuryDisplayCard):
-        # extract needed info from injury
+
+        # create confirmation popup
+        popup = CTkToplevel(self)
+        popup.title("Confirm Deletion")
+        popup.geometry("300x125")
+        popup.grab_set()  # Makes the popup modal (prevents interaction with main window)
+
+        # Get main window position and size
+        self.update_idletasks()  # Ensures accurate window size
+        main_x = self.winfo_x()
+        main_y = self.winfo_y()
+        main_width = self.winfo_width()
+        main_height = self.winfo_height()
+
+        # Calculate popup position
+        popup_width = 300
+        popup_height = 150
+        x_position = main_x + (main_width // 2) - (popup_width // 2)
+        y_position = main_y + (main_height // 2) - (popup_height // 2)
+
+        # Set popup geometry with calculated position
+        popup.geometry(f"{popup_width}x{popup_height}+{x_position}+{y_position}")
+
+        # Label message
+        label = CTkLabel(popup, text="Are you sure you want to\ndelete this injury?",
+                         wraplength=250)
+        label.pack(pady=20)
+
+        # Button frame
+        button_frame = CTkFrame(popup,
+                                fg_color="transparent")
+        button_frame.pack(pady=10)
+
+        # Yes button
+        def confirm_delete():
+            popup.destroy()  # close popup
+
+            # extract needed info from injury
+            injury_to_delete: InjuryRecord.Injury = injury_card.injury
+            injury_to_delete_id = injury_to_delete.id
+            injury_to_delete_indices = injury_to_delete.indices
+            injury_to_delete_type = injury_to_delete.type
+            injury_to_delete_locations = injury_to_delete.locations
+
+            # for now, selecting indices to remove
+            # deselect everything first
+
+            self.staged_injury_indices.clear()
+            self.staged_locations.clear()
+            self.set_staged_locations_label()
+            self.set_injury_area_label()
+
+            # update indices and locations
+            for index in injury_to_delete_indices:
+                # need to retrieve the button to toggle select on it
+                self.get_button(index).toggle_select()
+                self.stage_injury(index)
+
+            # delete injury from gui
+            for body_map in self.staged_locations:
+                self.body_maps_dict[body_map].remove_injuries_deselect_body_map(injury_to_delete_type)
+
+            # extract id, delete injury from record
+            self.record.remove_injury(injury_to_delete_id)
+
+            # update display to reflect changes
+            self.update_injury_display()
+            self.staged_injury_indices.clear()
+            self.staged_locations.clear()
+            self.set_staged_locations_label()
+            self.set_injury_area_label()
+
+        yes_button = CTkButton(button_frame,
+                               text="Yes",
+                               fg_color=colors.GREEN,
+                               hover_color=colors.DARK_GREEN,
+                               width=125,
+                               command=confirm_delete)
+        yes_button.pack(side="left", padx=10)
+
+        # No button
+        no_button = CTkButton(button_frame,
+                              text="No",
+                              fg_color=colors.MAROON,
+                              hover_color=colors.DARK_MAROON,
+                              width=125,
+                              command=popup.destroy)
+        no_button.pack(side="right", padx=10)
+
+    def edit_injury(self, injury_card: InjuryDisplayCard):
+        # same logic as deletion, but select the boxes afterward
         injury_to_delete: InjuryRecord.Injury = injury_card.injury
         injury_to_delete_id = injury_to_delete.id
         injury_to_delete_indices = injury_to_delete.indices
@@ -323,20 +411,18 @@ class BodyMapInterface(CTkFrame):
 
         # delete injury from gui
         for body_map in self.staged_locations:
-            self.body_maps_dict[body_map].remove_injuries_deselect_body_map(injury_to_delete_type)
+            self.body_maps_dict[body_map].remove_injuries(injury_to_delete_type)
 
         # extract id, delete injury from record
         self.record.remove_injury(injury_to_delete_id)
 
         # update display to reflect changes
-        self.update_injury_display()
-        self.staged_injury_indices.clear()
-        self.staged_locations.clear()
+        #self.update_injury_display()
+        #self.staged_injury_indices.clear()
+        #self.staged_locations.clear()
         self.set_staged_locations_label()
         self.set_injury_area_label()
-
-    def edit_injury(self, injury):
-        pass
+        self.update_injury_display()
 
     # places the chosen body map
     def place_body_map(self, body_map_name):

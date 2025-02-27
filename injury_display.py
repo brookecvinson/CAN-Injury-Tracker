@@ -30,12 +30,12 @@ class InjuryDisplayCard(CTkFrame):
                                      text="Edit Injury",
                                      fg_color=colors.GREEN,
                                      hover_color=colors.DARK_GREEN,
-                                     command=self.edit_button_callback)
+                                     command=lambda: edit_callback(self))
         self.delete_button = CTkButton(master=self.frame2,
                                        text="Delete Injury",
                                        fg_color=colors.MAROON,
                                        hover_color=colors.DARK_MAROON,
-                                       command=lambda : delete_callback(self))
+                                       command=lambda: delete_callback(self))
 
         # placing widgets
 
@@ -53,11 +53,6 @@ class InjuryDisplayCard(CTkFrame):
         self.edit_button.place(relx=0.05, relwidth=0.40)
         self.delete_button.place(relx=0.55, relwidth=0.40)
 
-    def edit_button_callback(self):
-        pass
-
-    def delete_button_callback(self):
-        pass
 
 
 
