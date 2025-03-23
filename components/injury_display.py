@@ -1,7 +1,6 @@
 from customtkinter import *
 
-import colors
-from colors import *
+from data import colors
 
 
 class InjuryDisplayCard(CTkFrame):

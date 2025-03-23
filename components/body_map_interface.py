@@ -1,9 +1,7 @@
-from customtkinter import *
-
-import colors
+from data import colors
 from injury_record import *
-from body_maps import *
-from injury_display import InjuryDisplayCard
+from components.body_maps import *
+from components.injury_display import InjuryDisplayCard
 
 
 # holds everything for the middle frame: body maps, info for adding injuries, current client info, etc
@@ -431,3 +429,4 @@ class BodyMapInterface(CTkFrame):
                 self.current_body_map.place_forget()
             self.body_maps_dict[body_map_name].place(relx=0, rely=0, relwidth=1, relheight=1)
             self.current_body_map = self.body_maps_dict[body_map_name]
+            # TODO: sleep while loading

@@ -2,7 +2,7 @@
 # makes sense to have individual records for each recording that can be written and retrieved in a common format for
 # the GUI to process
 # how should the injuries be stored?
-import body_map_data
+from data import body_map_data
 
 
 def find_location(index):

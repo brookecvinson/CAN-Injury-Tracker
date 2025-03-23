@@ -1,7 +1,7 @@
 from customtkinter import *
 from abc import ABC, abstractmethod
 
-from injury_button import InjuryButton, CustomInjuryButton
+from components.injury_button import InjuryButton, CustomInjuryButton
 
 
 # contains data and functions necessary for all maps, base for inheritance

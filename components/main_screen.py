@@ -1,13 +1,7 @@
-from customtkinter import *
-import json
-
-from body_map_interface import BodyMapInterface
-from record_initialization_tabview import RecordInitializationTabview
-import body_map_data
-import body_map_index_lists
-import body_maps
+from components.body_map_interface import BodyMapInterface
+from components.record_initialization_tabview import RecordInitializationTabview
 from injury_record import *
-from body_maps import *
+from components.body_maps import *
 
 
 class MainScreen(CTk):

@@ -1,6 +1,6 @@
 from customtkinter import CTkButton
-from injury_priority_multiset import InjuryPriorityMultiset
-import colors
+from components.injury_priority_multiset import InjuryPriorityMultiset
+from data import colors
 
 
 # basic injury button: location determined by body map tuple, size and color are constant
