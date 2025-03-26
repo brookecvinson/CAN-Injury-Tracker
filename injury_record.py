@@ -86,3 +86,6 @@ class InjuryRecord:
                            body_map_data.body_part_range_dict[body_part][1]):
             return_dict[index] = self.location_dictionary[index]
 
+    def safe_date_format(self) -> str:
+        return self.date.replace("/", "_")
+

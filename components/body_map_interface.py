@@ -2,6 +2,7 @@ from data import colors
 from injury_record import *
 from components.body_maps import *
 from components.injury_display import InjuryDisplayCard
+from excel_operations import *
 
 
 # holds everything for the middle frame: body maps, info for adding injuries, current client info, etc
@@ -82,6 +83,10 @@ class BodyMapInterface(CTkFrame):
         self.injury_display = CTkScrollableFrame(master=self.injury_display_frame,
                                                  label_text="Recorded Injuries",
                                                  fg_color="transparent")
+        self.save_record_button = CTkButton(master=self.injury_display_frame,
+                                            text="Save Record",
+                                            state="disabled",
+                                            command=lambda: save_record(self.record))
 
         # PLACING WIDGETS
 
@@ -120,7 +125,8 @@ class BodyMapInterface(CTkFrame):
         self.injury_error_label.grid(row=3, column=1)
 
         self.injury_display_frame.place(relx=0.65, rely=0, relwidth=0.35, relheight=1)
-        self.injury_display.place(relx=0.05, rely=0.025, relwidth=0.9, relheight=0.95)
+        self.injury_display.place(relx=0.05, rely=0.025, relwidth=0.9, relheight=0.89)
+        self.save_record_button.place(relx=0.2, rely=0.93, relwidth=0.6, relheight=0.05)
 
     # called by main screen when importing/creating a record
     def set_record(self, record):
@@ -132,6 +138,7 @@ class BodyMapInterface(CTkFrame):
         self.back_body_segmented_button.configure(state="normal")
         self.create_injury_button.configure(state="normal")
         self.unselect_all_button.configure(state="normal")
+        self.save_record_button.configure(state="normal")
         self.body_maps_dict["Front Head"] = CustomBodyFrame(master=self.body_map_holder, body_map_interface=self,
                                                             body_map_tuple=body_map_data.BODY_MAP_INIT_DICT[
                                                                 "front head"])
@@ -430,3 +437,4 @@ class BodyMapInterface(CTkFrame):
             self.body_maps_dict[body_map_name].place(relx=0, rely=0, relwidth=1, relheight=1)
             self.current_body_map = self.body_maps_dict[body_map_name]
             # TODO: sleep while loading
+
