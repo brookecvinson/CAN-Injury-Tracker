@@ -1,3 +1,4 @@
+import data.colors
 from data import colors
 from injury_record import *
 from components.body_maps import *
@@ -86,7 +87,7 @@ class BodyMapInterface(CTkFrame):
         self.save_record_button = CTkButton(master=self.injury_display_frame,
                                             text="Save Record",
                                             state="disabled",
-                                            command=lambda: save_record(self.record))
+                                            command=self.save_record_callback)
 
         # PLACING WIDGETS
 
@@ -438,3 +439,8 @@ class BodyMapInterface(CTkFrame):
             self.current_body_map = self.body_maps_dict[body_map_name]
             # TODO: sleep while loading
 
+    def save_record_callback(self):
+        save_record(self.record)
+        fg_color = self.save_record_button.cget("fg_color")
+        hover_color = self.save_record_button.cget("hover_color")
+        self.after(5000, lambda: self.save_record_button.configure(text="Save Record", fg_color=fg_color, hover_color=hover_color))
