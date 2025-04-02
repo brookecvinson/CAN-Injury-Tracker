@@ -1,5 +1,6 @@
 from components.body_map_interface import BodyMapInterface
 from components.record_initialization_tabview import RecordInitializationTabview
+from file_operations import check_for_client
 from injury_record import *
 from components.body_maps import *
 
@@ -89,19 +90,8 @@ class MainScreen(CTk):
 
         self.body_map_interface_frame.place(relx=0.25, rely=0, relwidth=0.75, relheight=1.00)
 
-        # right frame
-
-        # self.right_frame = CTkFrame(master=self, fg_color="transparent", bg_color="transparent")
-
-        # self.recorded_injuries_frame = CTkScrollableFrame(master=self.right_frame, label_text="Recorded Injuries",
-                                                          # fg_color="transparent")
-
-        # placing right frame
-
-        #self.right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=1.00)
-        #self.recorded_injuries_frame.place(relx=0.05, rely=0.025, relwidth=0.9, relheight=0.95)
-
     def create_record(self, client, date, time):
+        check_for_client(client)
         self.record = InjuryRecord(client=client, date=date, time=time, injury_list=[])
         self.body_map_interface_frame.set_record(self.record)
 

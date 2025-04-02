@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sharp-sandbox-455617-e9",
+  "private_key_id": "ff1eca627cd0c52baca8013e96da4a22b6461827",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDbrlBXuCAdW1Cc\nFvz2StlAKnAnvZuNiygtoMvwOs/HjwaiGAz/ghH0cTnh3kGU44ziRvspVlGiITOd\nSRwvW/U++9C1qyOqHoQsDAnKqiUZ2l6xqNZH6YHwhPqkG7GKTzK63Z6Cb0TUpose\nRaI4gbWezGj4XEO8Bs3kTOi1k3AqmPl9lAAd6K78F6jQq3iKZxC8G3hFm3gVkDce\nebiMLsoLY6h2fbtaAhnbct7WAGbU65lwlWhXdyAXwMiLBje1qzg94ocEOpFlqg1V\nIwoPeSS+SYecr4bI+Ifp38i3gK/igZVGFPLz7BqWJOAMlWmsmIeynrWr3ommf7T/\neHccwE1xAgMBAAECgf9m/Pf6Se0qxQ80YnBw9a6oSHAydZxIZbTBaxyXS4OdffRE\nibUn4N+BeaScZbxyv6F7t9O6743Vzge+KFlW2o4r2wzXL3m3y7BEwuiP/LQ9XcCH\nGqRrtF4pvceQH57CkkTtot7CPwoBhXjdtAM7T9hASSVkfTIh7+yN/W9OweWceFYm\njw2Er8dQWPDIlVRFDRaC9Wd/TpCrBxgBQsPjd+cPGg32KWhGeUuVRC0NkZ6cgH5c\nlpbsNhQPNh4+niUsa1wPrA7FjklJlDnXj7AwAaB7Grw0FC2SSj1eWp2G00kVLoiO\n0UjJ0/auY0ty2Z7eTTjM02xSboK5bMyXdEBWeYECgYEA9SNilJlY81YOvuCEvhYu\nKoR+e1jxLD/pakqR8nX/X77XvhVisayaYrldklfobjlxh7bTgOXUS/d767rxjOw1\n6Ia2sVFPbXHLqNZLf+QsG1Dn9mrBPTotACK+DsikcUN6j2UVn1jddwrZiicPaLbx\neEsr7VBb22MwQK9n+R1aDyECgYEA5WoqTXSM93qtwKs9IjhBPMGFfaQC7tocVzpR\nI3GoDrKjfgcy7E398auamCN8dcmurHLNNOKmWIsn78i3XlYQvTeeew7b8Xw1UiRb\neX+aXT9P1CfXE6mY6wRT7Cv94plWjP5J/98TJkeaTyu2IkRHV9o/Aca4ipfGEnpB\niBNlBFECgYEA24rTUQ59cYETN7PQboVi10VOGZ4wcFbU7xLV3vX6vn8mrOBuQX25\nzs0Aln4QdhcQLGF6zqgHF/oPi7Ejf/hU12k+2VNe9T/DC/TQLTvmnJg7Bp/ZbMJb\nZxG2cXsUezPZ4e7ADLQDtAeNiIMu87NUU03Pi3w6qCMPJf9x+NNmwsECgYEAxhsc\ndpBL3rV4b2UvwGoVo7J1ZN6JjdqZGJYKVPIjrrWCSyVKSxa6UMPgFrqmEkzb4pys\nKZwDC3j3Pq/z8KmfgNYTq65ULb8ViF5PA6c2FInElK7molsU6vVsxwfiEJhbThuU\nqTjoH2k7jlxvxj1x4iJbwFvrJfsUFwatqiUdWVECgYEA9QTmn5HpzOk8Bxcric82\nA9cke+TgdguJLjL8MaDs9at289mgo78e9HR5d5gwbL6DLg6Ga18Lk1j8+ctQfyE4\nHJirzIMJ5R3U2docX2odjKuE77cwo1KqRqifA0E1v2l1Gkiu/C/9CDby0yibyDwS\nOvaLpf2PsxevsXtSDO+GSK0=\n-----END PRIVATE KEY-----\n",
+  "client_email": "can-injury-tracker-drive@sharp-sandbox-455617-e9.iam.gserviceaccount.com",
+  "client_id": "106910824583377054466",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/can-injury-tracker-drive%40sharp-sandbox-455617-e9.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

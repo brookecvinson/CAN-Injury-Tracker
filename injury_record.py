@@ -25,9 +25,6 @@ class InjuryRecord:
             pass  # use injury class to initialize an injury, depends on how data is stored in files
         self.location_dictionary = {}
 
-        # FIXME: figure out way to import data from injury list into the location dictionary
-        # will depend on how data is stored, so figure that out later I guess
-
     class Injury:
         def __init__(self, injury_id, injury_type, indices, locations, area, note):
             self.id = injury_id
@@ -87,5 +84,5 @@ class InjuryRecord:
             return_dict[index] = self.location_dictionary[index]
 
     def safe_date_format(self) -> str:
-        return self.date.replace("/", "_")
+        return self.date.replace("/", "-")
 

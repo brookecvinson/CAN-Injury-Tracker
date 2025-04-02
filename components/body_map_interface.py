@@ -3,7 +3,7 @@ from data import colors
 from injury_record import *
 from components.body_maps import *
 from components.injury_display import InjuryDisplayCard
-from excel_operations import *
+from file_operations import *
 
 
 # holds everything for the middle frame: body maps, info for adding injuries, current client info, etc
@@ -239,7 +239,6 @@ class BodyMapInterface(CTkFrame):
         self.set_injury_area_label()
 
     # retrieves button of a given index in constant time
-    # TODO
     def get_button(self, index):
         for location, index_range in body_map_data.body_part_range_dict.items():
             if index_range[0] <= index <= index_range[1]:
@@ -437,7 +436,6 @@ class BodyMapInterface(CTkFrame):
                 self.current_body_map.place_forget()
             self.body_maps_dict[body_map_name].place(relx=0, rely=0, relwidth=1, relheight=1)
             self.current_body_map = self.body_maps_dict[body_map_name]
-            # TODO: sleep while loading
 
     def save_record_callback(self):
         save_record(self.record)
