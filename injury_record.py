@@ -19,6 +19,7 @@ class InjuryRecord:
         self.client = client
         self.date = date
         self.time = time  # AM or PM
+        print(self.time)
         self.injury_list = []
         self.next_injury_id = 1
         for injury in injury_list:
@@ -85,4 +86,7 @@ class InjuryRecord:
 
     def safe_date_format(self) -> str:
         return self.date.replace("/", "-")
+
+    def safe_time_format(self) -> str:
+        return self.time.replace(".", "")
 

@@ -1,5 +1,5 @@
 from components.main_screen import *
-from drive_operations import authenticate_drive
+from file_operations import authenticate_drive
 
 if __name__ == '__main__':
     drive = authenticate_drive()
