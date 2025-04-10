@@ -345,7 +345,7 @@ class BodyMapInterface(CTkFrame):
             injury_to_delete_id = injury_to_delete.id
             injury_to_delete_indices = injury_to_delete.indices
             injury_to_delete_type = injury_to_delete.type
-            injury_to_delete_locations = injury_to_delete.locations
+            injury_to_delete_locations = injury_to_delete.primary_locations
 
             # for now, selecting indices to remove
             # deselect everything first
@@ -398,7 +398,7 @@ class BodyMapInterface(CTkFrame):
         injury_to_delete_id = injury_to_delete.id
         injury_to_delete_indices = injury_to_delete.indices
         injury_to_delete_type = injury_to_delete.type
-        injury_to_delete_locations = injury_to_delete.locations
+        injury_to_delete_locations = injury_to_delete.primary_locations
 
         # for now, selecting indices to remove
         # deselect everything first
@@ -422,9 +422,6 @@ class BodyMapInterface(CTkFrame):
         self.record.remove_injury(injury_to_delete_id)
 
         # update display to reflect changes
-        #self.update_injury_display()
-        #self.staged_injury_indices.clear()
-        #self.staged_locations.clear()
         self.set_staged_locations_label()
         self.set_injury_area_label()
         self.update_injury_display()

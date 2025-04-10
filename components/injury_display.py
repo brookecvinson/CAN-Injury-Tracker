@@ -8,7 +8,7 @@ class InjuryDisplayCard(CTkFrame):
         super().__init__(master=master, height=100)
 
         print(injury.get_locations_string())
-        print(injury.locations)
+        print(injury.primary_locations)
         print(injury.area)
 
         self.injury = injury

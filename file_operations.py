@@ -8,7 +8,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from injury_record import InjuryRecord
 
 # path to service account JSON key file
-SERVICE_ACCOUNT_FILE = "drive_creds/sharp-sandbox-455617-e9-ff1eca627cd0.json"
+SERVICE_ACCOUNT_FILE = "drive_creds/sharp-sandbox-455617-e9-76fea66cb16c.json"
 
 # the Google Drive folder ID
 FOLDER_ID = "1EqrtKzLiKc2UpjE_EFJJo5bVGEEhXbMY"
@@ -43,6 +43,8 @@ def save_record(record: InjuryRecord):
     ws.title = "Injury Data"
 
     columns = ["ID", "Type", "Locations", "Area", "Note"]
+
+    # TODO: create from template files
 
     ws.append(columns) # adds column names, makes bold
     bold_font = Font(bold=True)

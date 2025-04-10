@@ -31,13 +31,15 @@ class InjuryRecord:
             self.id = injury_id
             self.type = injury_type
             self.indices = set(indices)  # Ensure it's a set
-            self.locations = list(locations)  # Ensure it's a list copy
+            self.primary_locations = list(locations)  # Ensure it's a list copy
+            self.secondary_location = None
+            self.side = None
             self.area = area
             self.note = note if note else "None"
 
             # Debug prints
             print(f"Created Injury {self.id}:")
-            print(f"  Locations: {self.locations}")
+            print(f"  Locations: {self.primary_locations}")
             print(f"  Indices: {self.indices}")
 
         def print_injury(self):
@@ -48,7 +50,7 @@ class InjuryRecord:
             print("*" * 30)
 
         def get_locations_string(self):
-            return ", ".join(self.locations) if self.locations else "None"
+            return ", ".join(self.primary_locations) if self.primary_locations else "None"
 
     # injury record methods
 
