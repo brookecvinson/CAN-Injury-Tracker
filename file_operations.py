@@ -1,10 +1,14 @@
+from shutil import copyfile
+
 from openpyxl import Workbook
 from openpyxl.reader.excel import load_workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, PatternFill, Border, Alignment, Protection
 from pathlib import Path
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
+
+from data.body_map_data import find_secondary_range_side
 from injury_record import InjuryRecord
 
 # path to service account JSON key file
@@ -38,21 +42,97 @@ def initialize_master_sheet(filepath):
 
 
 def save_record(record: InjuryRecord):
-    wb = Workbook()
+    file_name = f"{record.client} {record.safe_date_format()} {record.safe_time_format()}.xlsx"
+
+    copyfile("excel_templates/template.xlsx", file_name)
+    wb = load_workbook(file_name)
     ws = wb.active
     ws.title = "Injury Data"
 
-    columns = ["ID", "Type", "Locations", "Area", "Note"]
+    # TODO: add to template
 
-    # TODO: create from template files
+    template_row = ws[4]
+    ws.delete_rows(2)
 
-    ws.append(columns) # adds column names, makes bold
-    bold_font = Font(bold=True)
-    for cell in ws[1]:  # ws[1] refers to the first row
-        cell.font = bold_font
+    # for injury in record.injury_list:  # need to handle secondary injury area
+    #     ws.append([injury.id, injury.type, injury.get_locations_string(), injury.area, injury.note])
 
-    for injury in record.injury_list:
-        ws.append([injury.id, injury.type, injury.get_locations_string(), injury.area, injury.note])
+    for i, injury in enumerate(record.injury_list):
+        row_idx = 3 + i
+        ws.insert_rows(row_idx)
+
+        # Apply formatting from the template row to this row
+        for col_idx, template_cell in enumerate(template_row, start=1):
+            new_cell = ws.cell(row=row_idx, column=col_idx)
+
+            # Copy the font attributes manually
+            if template_cell.font:
+                new_cell.font = Font(
+                    name=template_cell.font.name,
+                    size=template_cell.font.size,
+                    bold=template_cell.font.bold,
+                    italic=template_cell.font.italic,
+                    color=template_cell.font.color
+                )
+
+            # Copy the border attributes manually
+            if template_cell.border:
+                new_cell.border = Border(
+                    left=template_cell.border.left,
+                    right=template_cell.border.right,
+                    top=template_cell.border.top,
+                    bottom=template_cell.border.bottom,
+                    diagonal=template_cell.border.diagonal,
+                    diagonal_direction=template_cell.border.diagonal_direction,
+                    outline=template_cell.border.outline,
+                    vertical=template_cell.border.vertical,
+                    horizontal=template_cell.border.horizontal
+                )
+
+            # Copy the fill attributes manually
+            if template_cell.fill:
+                new_cell.fill = PatternFill(
+                    start_color=template_cell.fill.start_color,
+                    end_color=template_cell.fill.end_color,
+                    fill_type=template_cell.fill.fill_type
+                )
+
+            # Copy the number_format attributes manually
+            if template_cell.number_format:
+                new_cell.number_format = template_cell.number_format
+
+            # Copy the protection attributes manually
+            if template_cell.protection:
+                new_cell.protection = Protection(locked=template_cell.protection.locked,
+                                                 hidden=template_cell.protection.hidden)
+
+            # Copy the alignment attributes manually
+            if template_cell.alignment:
+                new_cell.alignment = Alignment(
+                    horizontal=template_cell.alignment.horizontal,
+                    vertical=template_cell.alignment.vertical,
+                    text_rotation=template_cell.alignment.text_rotation,
+                    wrap_text=template_cell.alignment.wrap_text,
+                    shrink_to_fit=template_cell.alignment.shrink_to_fit,
+                    indent=template_cell.alignment.indent
+                )
+
+        # Write injury data
+        # need to get secondary injury data
+
+        secondary_info_list = find_secondary_range_side(injury.indices.pop())
+
+        ws.cell(row=row_idx, column=2, value=injury.get_locations_string())
+        ws.cell(row=row_idx, column=3, value=secondary_info_list[0])
+        ws.cell(row=row_idx, column=4, value=secondary_info_list[1])
+        ws.cell(row=row_idx, column=5, value=injury.type)
+        ws.cell(row=row_idx, column=6, value=injury.area)
+        ws.cell(row=row_idx, column=7, value=injury.note)
+
+        # Summary formulas — added after the last data row
+    last_row = 4 + len(record.injury_list) - 1
+    ws["J3"] = f"=SUM(F4:F{last_row})"
+    ws["J2"] = f"=AVERAGE(F4:F{last_row})"
 
     # TODO: add summary info at bottom, probably with a formula
 
@@ -77,34 +157,34 @@ def save_record(record: InjuryRecord):
     Path(temp_path).unlink()
 
     # locate the client-master.xlsx file in Google Drive
-    master_file_list = drive.ListFile({
-        'q': f"'{client_folder_id}' in parents and title = '{record.client}-master.xlsx' and trashed=false"
-    }).GetList()
-
-    if not master_file_list:
-        print(f"Error: {record.client}-master.xlsx not found in Google Drive.")
-        return
-
-    master_file = master_file_list[0]  # assuming only one master file exists
-
-    # download the master file
-    master_temp_path = f"{record.client}-master.xlsx"
-    master_file.GetContentFile(master_temp_path)  # download it locally
-
-    # edit master sheet
-    master_wb = load_workbook(master_temp_path)
-    master_ws = master_wb.active
-
-    # TODO: edit master sheet
-
-    master_wb.save(master_temp_path)  # Save updates
-
-    # re-upload the updated master file
-    master_file.SetContentFile(master_temp_path)
-    master_file.Upload()
-
-    # remove the temporary master file
-    Path(master_temp_path).unlink()
+    # master_file_list = drive.ListFile({
+    #     'q': f"'{client_folder_id}' in parents and title = '{record.client}-master.xlsx' and trashed=false"
+    # }).GetList()
+    #
+    # if not master_file_list:
+    #     print(f"Error: {record.client}-master.xlsx not found in Google Drive.")
+    #     return
+    #
+    # master_file = master_file_list[0]  # assuming only one master file exists
+    #
+    # # download the master file
+    # master_temp_path = f"{record.client}-master.xlsx"
+    # master_file.GetContentFile(master_temp_path)  # download it locally
+    #
+    # # edit master sheet
+    # master_wb = load_workbook(master_temp_path)
+    # master_ws = master_wb.active
+    #
+    # # TODO: edit master sheet
+    #
+    # master_wb.save(master_temp_path)  # Save updates
+    #
+    # # re-upload the updated master file
+    # master_file.SetContentFile(master_temp_path)
+    # master_file.Upload()
+    #
+    # # remove the temporary master file
+    # Path(master_temp_path).unlink()
 
 
 def get_client_data_folder_id():

@@ -295,3 +295,14 @@ secondary_body_part_ranges = [
     (7845, 7847, "Foot", "Left"),
     (7848, 7850, "Foot", "Right")
 ]
+
+range_starts = [part[0] for part in secondary_body_part_ranges]
+
+def find_secondary_range_side(index):
+    from bisect import bisect_right
+    i = bisect_right(range_starts, index) - 1
+    if i >= 0 and secondary_body_part_ranges[i][0] <= index <= secondary_body_part_ranges[i][1]:
+        if len(secondary_body_part_ranges[i]) > 3:
+            return [secondary_body_part_ranges[i][2], secondary_body_part_ranges[i][3]]
+        return [secondary_body_part_ranges[i][2], ""]
+    return ["", ""]
