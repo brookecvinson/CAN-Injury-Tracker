@@ -11,9 +11,11 @@ from datetime import datetime
 
 from data.body_map_data import find_secondary_range_side
 from injury_record import InjuryRecord
+import os
 
 # path to service account JSON key file
-SERVICE_ACCOUNT_FILE = "drive_creds/sharp-sandbox-455617-e9-76fea66cb16c.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, "drive_creds", "sharp-sandbox-455617-e9-76fea66cb16c.json")
 
 # the Google Drive folder ID
 FOLDER_ID = "1EqrtKzLiKc2UpjE_EFJJo5bVGEEhXbMY"
