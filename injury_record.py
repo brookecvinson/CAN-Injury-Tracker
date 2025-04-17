@@ -2,7 +2,7 @@
 # makes sense to have individual records for each recording that can be written and retrieved in a common format for
 # the GUI to process
 # how should the injuries be stored?
-import body_map_data
+from data import body_map_data
 
 
 def find_location(index):
@@ -19,27 +19,27 @@ class InjuryRecord:
         self.client = client
         self.date = date
         self.time = time  # AM or PM
+        print(self.time)
         self.injury_list = []
         self.next_injury_id = 1
         for injury in injury_list:
             pass  # use injury class to initialize an injury, depends on how data is stored in files
         self.location_dictionary = {}
 
-        # FIXME: figure out way to import data from injury list into the location dictionary
-        # will depend on how data is stored, so figure that out later I guess
-
     class Injury:
         def __init__(self, injury_id, injury_type, indices, locations, area, note):
             self.id = injury_id
             self.type = injury_type
             self.indices = set(indices)  # Ensure it's a set
-            self.locations = list(locations)  # Ensure it's a list copy
+            self.primary_locations = list(locations)  # Ensure it's a list copy
+            self.secondary_location = None
+            self.side = None
             self.area = area
             self.note = note if note else "None"
 
             # Debug prints
             print(f"Created Injury {self.id}:")
-            print(f"  Locations: {self.locations}")
+            print(f"  Locations: {self.primary_locations}")
             print(f"  Indices: {self.indices}")
 
         def print_injury(self):
@@ -50,7 +50,7 @@ class InjuryRecord:
             print("*" * 30)
 
         def get_locations_string(self):
-            return ", ".join(self.locations) if self.locations else "None"
+            return ", ".join(self.primary_locations) if self.primary_locations else "None"
 
     # injury record methods
 
@@ -85,4 +85,21 @@ class InjuryRecord:
         for index in range(body_map_data.body_part_range_dict[body_part][0],
                            body_map_data.body_part_range_dict[body_part][1]):
             return_dict[index] = self.location_dictionary[index]
+
+    def get_total_injury_area(self):
+        total_area = 0
+        for injury in self.injury_list:
+            total_area += injury.area
+        return total_area
+
+    def get_avg_injury_area(self):
+        if len(self.injury_list) == 0:
+            return 0
+        return self.get_total_injury_area() / len(self.injury_list)
+
+    def safe_date_format(self) -> str:
+        return self.date.replace("/", "-")
+
+    def safe_time_format(self) -> str:
+        return self.time.replace(".", "")
 

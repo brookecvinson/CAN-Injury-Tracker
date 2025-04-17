@@ -1,9 +1,9 @@
-from customtkinter import *
-
-import colors
+import data.colors
+from data import colors
 from injury_record import *
-from body_maps import *
-from injury_display import InjuryDisplayCard
+from components.body_maps import *
+from components.injury_display import InjuryDisplayCard
+from file_operations import *
 
 
 # holds everything for the middle frame: body maps, info for adding injuries, current client info, etc
@@ -84,6 +84,10 @@ class BodyMapInterface(CTkFrame):
         self.injury_display = CTkScrollableFrame(master=self.injury_display_frame,
                                                  label_text="Recorded Injuries",
                                                  fg_color="transparent")
+        self.save_record_button = CTkButton(master=self.injury_display_frame,
+                                            text="Save Record",
+                                            state="disabled",
+                                            command=self.save_record_callback)
 
         # PLACING WIDGETS
 
@@ -122,7 +126,8 @@ class BodyMapInterface(CTkFrame):
         self.injury_error_label.grid(row=3, column=1)
 
         self.injury_display_frame.place(relx=0.65, rely=0, relwidth=0.35, relheight=1)
-        self.injury_display.place(relx=0.05, rely=0.025, relwidth=0.9, relheight=0.95)
+        self.injury_display.place(relx=0.05, rely=0.025, relwidth=0.9, relheight=0.89)
+        self.save_record_button.place(relx=0.2, rely=0.93, relwidth=0.6, relheight=0.05)
 
     # called by main screen when importing/creating a record
     def set_record(self, record):
@@ -134,6 +139,7 @@ class BodyMapInterface(CTkFrame):
         self.back_body_segmented_button.configure(state="normal")
         self.create_injury_button.configure(state="normal")
         self.unselect_all_button.configure(state="normal")
+        self.save_record_button.configure(state="normal")
         self.body_maps_dict["Front Head"] = CustomBodyFrame(master=self.body_map_holder, body_map_interface=self,
                                                             body_map_tuple=body_map_data.BODY_MAP_INIT_DICT[
                                                                 "front head"])
@@ -233,7 +239,6 @@ class BodyMapInterface(CTkFrame):
         self.set_injury_area_label()
 
     # retrieves button of a given index in constant time
-    # TODO
     def get_button(self, index):
         for location, index_range in body_map_data.body_part_range_dict.items():
             if index_range[0] <= index <= index_range[1]:
@@ -340,7 +345,7 @@ class BodyMapInterface(CTkFrame):
             injury_to_delete_id = injury_to_delete.id
             injury_to_delete_indices = injury_to_delete.indices
             injury_to_delete_type = injury_to_delete.type
-            injury_to_delete_locations = injury_to_delete.locations
+            injury_to_delete_locations = injury_to_delete.primary_locations
 
             # for now, selecting indices to remove
             # deselect everything first
@@ -393,7 +398,7 @@ class BodyMapInterface(CTkFrame):
         injury_to_delete_id = injury_to_delete.id
         injury_to_delete_indices = injury_to_delete.indices
         injury_to_delete_type = injury_to_delete.type
-        injury_to_delete_locations = injury_to_delete.locations
+        injury_to_delete_locations = injury_to_delete.primary_locations
 
         # for now, selecting indices to remove
         # deselect everything first
@@ -417,9 +422,6 @@ class BodyMapInterface(CTkFrame):
         self.record.remove_injury(injury_to_delete_id)
 
         # update display to reflect changes
-        #self.update_injury_display()
-        #self.staged_injury_indices.clear()
-        #self.staged_locations.clear()
         self.set_staged_locations_label()
         self.set_injury_area_label()
         self.update_injury_display()
@@ -431,3 +433,9 @@ class BodyMapInterface(CTkFrame):
                 self.current_body_map.place_forget()
             self.body_maps_dict[body_map_name].place(relx=0, rely=0, relwidth=1, relheight=1)
             self.current_body_map = self.body_maps_dict[body_map_name]
+
+    def save_record_callback(self):
+        save_record(self.record)
+        fg_color = self.save_record_button.cget("fg_color")
+        hover_color = self.save_record_button.cget("hover_color")
+        self.after(5000, lambda: self.save_record_button.configure(text="Save Record", fg_color=fg_color, hover_color=hover_color))

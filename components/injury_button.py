@@ -1,6 +1,6 @@
 from customtkinter import CTkButton
-from injury_priority_multiset import InjuryPriorityMultiset
-import colors
+from components.injury_priority_multiset import InjuryPriorityMultiset
+from data import colors
 
 
 # basic injury button: location determined by body map tuple, size and color are constant
@@ -23,6 +23,10 @@ class InjuryButton(CTkButton):
         self.selected = False
         self.injury_set = InjuryPriorityMultiset()
 
+        self.bind("<B1-Motion>", self.paint_select)
+
+
+
     # update state of button
     def toggle_select(self):
         # selecting
@@ -33,6 +37,12 @@ class InjuryButton(CTkButton):
         else:
             self.configure(fg_color=self.unselected_fg_color, hover_color=self.unselected_hover_color)
             self.selected = False
+
+    def paint_select(self, event=None):
+        if not self.selected:
+            self.configure(fg_color=self.selected_fg_color, hover_color=self.selected_hover_color)
+            self.selected = True
+            self.body_map_interface.stage_injury(self.index)
 
     # handles front and back end parts of button functionality
     def button_function(self):

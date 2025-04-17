@@ -1,4 +1,6 @@
 from customtkinter import *
+
+from file_operations import get_client_initials_dict
 from injury_record import *
 from time import *
 
@@ -33,7 +35,7 @@ class RecordInitializationTabview(CTkTabview):
         self.date_button = CTkButton(master=self.entry_frame, text="Use Current Date", command=self.set_date_button)
         self.time_segmented_button = CTkSegmentedButton(master=self.entry_frame, values=["AM", "PM"])
         self.time_button = CTkButton(master=self.entry_frame, text="Use Current Time", command=self.set_time_button)
-        self.client_combobox = CTkComboBox(master=self.entry_frame, values=[])
+        self.client_combobox = CTkComboBox(master=self.entry_frame, values=list(get_client_initials_dict().keys()))
         self.client_combobox.set("Client Initials")
         self.client_clear_button = CTkButton(master=self.entry_frame, text="Clear Text",
                                              command=self.clear_client_combobox)
@@ -89,6 +91,6 @@ class RecordInitializationTabview(CTkTabview):
             self.error_text.set("Please enter/select a client")
         else:
             self.error_text.set("")
-            self.record_activation_func(self.client_combobox.get(),
+            self.record_activation_func(self.client_combobox.get().upper(),
                                         self.date_entry.get(),
                                         self.time_segmented_button.get())
