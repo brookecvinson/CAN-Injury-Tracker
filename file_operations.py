@@ -7,6 +7,7 @@ from pathlib import Path
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 
 from data.body_map_data import find_secondary_range_side
 from injury_record import InjuryRecord
@@ -25,12 +26,14 @@ def authenticate_drive():
     gauth.credentials = creds
     return GoogleDrive(gauth)
 
+
 # authenticate + create Google Drive instance
 drive = authenticate_drive()
 
 # list files inside the specific folder
 query = f"'{FOLDER_ID}' in parents and trashed=false"
 file_list = drive.ListFile({'q': query}).GetList()
+
 
 # debug print file names and IDs
 # for file in file_list:
@@ -41,24 +44,37 @@ def initialize_master_sheet(filepath):
     pass
 
 
+def get_or_create_drive_folder(service, parent_id, folder_name):
+    query = f"'{parent_id}' in parents and trashed = false and title = '{folder_name}' and mimeType = 'application/vnd.google-apps.folder'"
+    folder_list = service.ListFile({'q': query}).GetList()
+
+    if folder_list:
+        return folder_list[0]['id']
+    else:
+        new_folder = service.CreateFile({
+            'title': folder_name,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [{'id': parent_id}]
+        })
+        new_folder.Upload()
+        return new_folder['id']
+
+
 def save_record(record: InjuryRecord):
     file_name = f"{record.client} {record.safe_date_format()} {record.safe_time_format()}.xlsx"
 
-    copyfile("excel_templates/template.xlsx", file_name)
-    wb = load_workbook(file_name)
-    ws = wb.active
-    ws.title = "Injury Data"
-
-    # TODO: add to template
+    # copyfile("excel_templates/template.xlsx", file_name)
+    wb = load_workbook("excel_templates/template.xlsx")
+    ws = wb["Injury Data"]
 
     template_row = ws[4]
-    ws.delete_rows(2)
+    ws.delete_rows(4)
 
     # for injury in record.injury_list:  # need to handle secondary injury area
     #     ws.append([injury.id, injury.type, injury.get_locations_string(), injury.area, injury.note])
 
     for i, injury in enumerate(record.injury_list):
-        row_idx = 3 + i
+        row_idx = 4 + i
         ws.insert_rows(row_idx)
 
         # Apply formatting from the template row to this row
@@ -129,7 +145,13 @@ def save_record(record: InjuryRecord):
         ws.cell(row=row_idx, column=6, value=injury.area)
         ws.cell(row=row_idx, column=7, value=injury.note)
 
-        # Summary formulas — added after the last data row
+    # client info at top of record
+
+    ws["B2"] = f"Client: {record.client}"
+    ws["C2"] = f"Date: {record.date}"
+    ws["D2"] = f"Time: {record.time}"
+
+    # Summary formulas — added after the last data row
     last_row = 4 + len(record.injury_list) - 1
     ws["J3"] = f"=SUM(F4:F{last_row})"
     ws["J2"] = f"=AVERAGE(F4:F{last_row})"
@@ -139,21 +161,30 @@ def save_record(record: InjuryRecord):
     # TODO: add graphs?
 
     # SAVING TO DRIVE
-    # get client folder ID from the dictionary
+
+    record_date = datetime.strptime(record.date, "%m/%d/%Y")
+    year_str = record_date.strftime("%Y")
+    month_str = record_date.strftime("%B")  # e.g., 'April'
+    week_str = f"Week {record_date.isocalendar()[1]}"  # ISO week number
+
     client_initials_dict = get_client_initials_dict()
-    client_folder_id = client_initials_dict[record.client]  # folder is guaranteed to exist
+    client_folder_id = client_initials_dict[record.client]
 
-    # save new record to a separate file
-    file_name = f"{record.client}_{record.safe_date_format()}_{record.safe_time_format()}.xlsx"
+    # Get or create Year > Month > Week subfolders
+    year_folder_id = get_or_create_drive_folder(drive, client_folder_id, year_str)
+    month_folder_id = get_or_create_drive_folder(drive, year_folder_id, month_str)
+    week_folder_id = get_or_create_drive_folder(drive, month_folder_id, week_str)
+
+    # Save locally
     temp_path = file_name
-    wb.save(temp_path)  # save the workbook locally
+    wb.save(temp_path)
 
-    # upload the new record file to Google Drive
-    file_drive = drive.CreateFile({'title': file_name, 'parents': [{'id': client_folder_id}]})
+    # Upload to correct Google Drive folder
+    file_drive = drive.CreateFile({'title': file_name, 'parents': [{'id': week_folder_id}]})
     file_drive.SetContentFile(temp_path)
     file_drive.Upload()
 
-    # remove temp local file
+    # Clean up
     Path(temp_path).unlink()
 
     # locate the client-master.xlsx file in Google Drive
