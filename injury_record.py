@@ -86,6 +86,17 @@ class InjuryRecord:
                            body_map_data.body_part_range_dict[body_part][1]):
             return_dict[index] = self.location_dictionary[index]
 
+    def get_total_injury_area(self):
+        total_area = 0
+        for injury in self.injury_list:
+            total_area += injury.area
+        return total_area
+
+    def get_avg_injury_area(self):
+        if len(self.injury_list) == 0:
+            return 0
+        return self.get_total_injury_area() / len(self.injury_list)
+
     def safe_date_format(self) -> str:
         return self.date.replace("/", "-")
 
