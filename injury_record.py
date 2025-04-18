@@ -27,12 +27,13 @@ class InjuryRecord:
         self.location_dictionary = {}
 
     class Injury:
-        def __init__(self, injury_id, injury_type, indices, locations, area, note):
+        def __init__(self, injury_id, injury_type, indices, locations, area, note, injury_depth):
             self.id = injury_id
             self.type = injury_type
             self.indices = set(indices)  # Ensure it's a set
             self.primary_locations = list(locations)  # Ensure it's a list copy
             self.secondary_location = None
+            self.depth = injury_depth
             self.side = None
             self.area = area
             self.note = note if note else "None"
@@ -54,9 +55,9 @@ class InjuryRecord:
 
     # injury record methods
 
-    def create_injury(self, injury_type, indices, locations, area, note):
+    def create_injury(self, injury_type, indices, locations, area, note, injury_depth):
         # create injury, append to list
-        new_injury = self.Injury(self.next_injury_id, injury_type, indices, locations, area, note)
+        new_injury = self.Injury(self.next_injury_id, injury_type, indices, locations, area, note, injury_depth)
         new_injury.print_injury()
         self.injury_list.append(new_injury)
         # increment ID
