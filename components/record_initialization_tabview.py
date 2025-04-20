@@ -61,8 +61,6 @@ class RecordInitializationTabview(CTkTabview):
         self.error_label.pack(side="bottom", pady=10)
         self.create_record_button.pack(side="bottom", pady=12)
 
-        self.tab2 = self.add("View Past Record")
-
         self.update_time()
 
     def update_time(self):
