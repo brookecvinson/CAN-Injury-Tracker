@@ -95,11 +95,38 @@ class InjuryRecord:
     def get_avg_injury_area(self):
         if len(self.injury_list) == 0:
             return 0
-        return self.get_total_injury_area() / len(self.injury_list)
+        return self.get_total_injury_area() / self.get_num_injuries()
+
+    def get_num_injuries(self):
+        return len(self.injury_list)
 
     def safe_date_format(self) -> str:
         return self.date.replace("/", "-")
 
     def safe_time_format(self) -> str:
         return self.time.replace(".", "")
+
+    def get_injury_type_dict(self):
+        injury_type_dict = {
+            "Bruise": 0,
+            "Open Wound": 0,
+            "Closed Wound": 0,
+            "Redness": 0,
+            "Other": 0
+        }
+        for injury in self.injury_list:
+            injury: InjuryRecord.Injury
+            injury_type_dict[injury.type] += 1
+        return injury_type_dict
+
+    def get_date(self):
+        return self.date
+
+    def get_largest_injury_size(self):
+        largest_size = 0
+        for injury in self.injury_list:
+            injury: InjuryRecord.Injury
+            if injury.area > largest_size:
+                largest_size = injury.area
+        return largest_size
 

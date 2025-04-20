@@ -156,10 +156,6 @@ def save_record(record: InjuryRecord):
     ws["J3"] = f"=SUM(F4:F{last_row})"
     ws["J2"] = f"=AVERAGE(F4:F{last_row})"
 
-    # TODO: add summary info at bottom, probably with a formula
-
-    # TODO: add graphs?
-
     # SAVING TO DRIVE
 
     record_date = datetime.strptime(record.date, "%m/%d/%Y")
@@ -188,34 +184,77 @@ def save_record(record: InjuryRecord):
     Path(temp_path).unlink()
 
     # locate the client-master.xlsx file in Google Drive
-    # master_file_list = drive.ListFile({
-    #     'q': f"'{client_folder_id}' in parents and title = '{record.client}-master.xlsx' and trashed=false"
-    # }).GetList()
-    #
-    # if not master_file_list:
-    #     print(f"Error: {record.client}-master.xlsx not found in Google Drive.")
-    #     return
-    #
-    # master_file = master_file_list[0]  # assuming only one master file exists
-    #
-    # # download the master file
-    # master_temp_path = f"{record.client}-master.xlsx"
-    # master_file.GetContentFile(master_temp_path)  # download it locally
-    #
-    # # edit master sheet
-    # master_wb = load_workbook(master_temp_path)
-    # master_ws = master_wb.active
-    #
-    # # TODO: edit master sheet
-    #
-    # master_wb.save(master_temp_path)  # Save updates
-    #
-    # # re-upload the updated master file
-    # master_file.SetContentFile(master_temp_path)
-    # master_file.Upload()
-    #
-    # # remove the temporary master file
-    # Path(master_temp_path).unlink()
+    master_file_list = drive.ListFile({
+        'q': f"'{client_folder_id}' in parents and title = '{record.client}-master.xlsx' and trashed=false"
+    }).GetList()
+
+    if not master_file_list:
+        print(f"Error: {record.client}-master.xlsx not found in Google Drive.")
+        return
+
+    master_file = master_file_list[0]  # assuming only one master file exists
+
+    # download the master file
+    master_temp_path = f"{record.client}-master.xlsx"
+    master_file.GetContentFile(master_temp_path)  # download it locally
+
+    # edit master sheet
+    master_wb = load_workbook(master_temp_path)
+    master_ws = master_wb["Master Data"]
+
+
+    # Step 1: Find the next empty row in column B after row 3
+    row_idx = 4
+    while master_ws.cell(row=row_idx, column=2).value is not None:
+        row_idx += 1
+    row_idx += 1
+    # Step 2: Copy styles from the previous row (row_idx - 1)
+    for col in range(2, 12):  # Columns B (2) to K (10)
+        source_cell = master_ws.cell(row=row_idx - 1, column=col)
+        target_cell = master_ws.cell(row=row_idx, column=col)
+
+        target_cell.font = source_cell.font.copy()
+        target_cell.fill = source_cell.fill.copy()
+        target_cell.border = source_cell.border.copy()
+        target_cell.alignment = source_cell.alignment.copy()
+        target_cell.number_format = source_cell.number_format
+        target_cell.protection = source_cell.protection.copy()
+
+    # Step 3: Insert data into the newly styled row
+    date_time = f"{record.get_date()}   {record.time}"
+    num_injuries = record.get_num_injuries()
+    total_area = record.get_total_injury_area()
+    avg_injury_size = record.get_avg_injury_area()
+    largest_injury_size = record.get_largest_injury_size()
+    injury_type_dict = record.get_injury_type_dict()
+
+    num_bruises = injury_type_dict["Bruise"]
+    num_open_wounds = injury_type_dict["Open Wound"]
+    num_closed_wounds = injury_type_dict["Closed Wound"]
+    num_redness = injury_type_dict["Redness"]
+    num_other = injury_type_dict["Other"]
+
+    row_idx -= 1
+
+    master_ws.cell(row=row_idx, column=2, value=date_time)
+    master_ws.cell(row=row_idx, column=3, value=num_injuries)
+    master_ws.cell(row=row_idx, column=4, value=total_area)
+    master_ws.cell(row=row_idx, column=5, value=avg_injury_size)
+    master_ws.cell(row=row_idx, column=6, value=largest_injury_size)
+    master_ws.cell(row=row_idx, column=7, value=num_bruises)
+    master_ws.cell(row=row_idx, column=8, value=num_open_wounds)
+    master_ws.cell(row=row_idx, column=9, value=num_closed_wounds)
+    master_ws.cell(row=row_idx, column=10, value=num_redness)
+    master_ws.cell(row=row_idx, column=11, value=num_other)
+
+    master_wb.save(master_temp_path)  # Save updates
+
+    # re-upload the updated master file
+    master_file.SetContentFile(master_temp_path)
+    master_file.Upload()
+
+    # remove the temporary master file
+    Path(master_temp_path).unlink()
 
 
 def get_client_data_folder_id():
@@ -276,9 +315,10 @@ def check_for_client(client_initials):
         client_folder.Upload()
 
     # Create the "client-master.xlsx" file in the client's folder
+    template_local_path = "excel_templates/master-template.xlsx"
     master_file_path = f"{client_initials}-master.xlsx"
 
-    # Check if the master file already exists
+    # Check if the master file already exists in the client folder
     master_file = None
     file_list = drive.ListFile({'q': f"'{client_folder['id']}' in parents and trashed=false"}).GetList()
     for file in file_list:
@@ -286,8 +326,9 @@ def check_for_client(client_initials):
             master_file = file
             break
 
-    # If the file doesn't exist, create it
+    # If not found, upload a copy of the local template file to the client's folder
     if not master_file:
         new_file = drive.CreateFile({'title': master_file_path, 'parents': [{'id': client_folder['id']}]})
-        # Assuming you want to upload a local file to Google Drive
+        new_file.SetContentFile(template_local_path)
         new_file.Upload()
+
