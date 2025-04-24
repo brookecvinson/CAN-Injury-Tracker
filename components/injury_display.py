@@ -25,6 +25,8 @@ class InjuryDisplayCard(CTkFrame):
                                    text=f"Area: {injury.area} cm²")
         self.locations_label = CTkLabel(master=self,
                                         text=f"Location(s): {self.locations}")
+        self.depth_label = CTkLabel(master=self,
+                                        text=f"Depth: {injury.depth}")
         self.edit_button = CTkButton(master=self.frame2,
                                      text="Edit Injury",
                                      fg_color=colors.GREEN,
@@ -42,10 +44,12 @@ class InjuryDisplayCard(CTkFrame):
         self.frame2.pack_propagate(False)
 
         self.frame1.pack(pady=5, fill=X, expand=False)
-        self.id_label.place(relx=0.1)
-        self.topography_label.place(relx=0.3)
+        #self.id_label.place(relx=0.1)
+        #self.topography_label.place(relx=0.3)
+        self.topography_label.pack()
 
         self.locations_label.pack()
+        self.depth_label.pack()
         # self.area_label.pack()
 
         self.frame2.pack(pady=5, fill=X, expand=False)

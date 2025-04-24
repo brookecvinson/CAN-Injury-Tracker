@@ -20,6 +20,7 @@ class BodyMapInterface(CTkFrame):
 
         # types of injuries users can select
         self.injury_types = ["Bruise", "Open Wound", "Closed Wound", "Redness", "Other"]
+        self.injury_depth = ["Superficial", "Moderate", "Severe"]
 
         # record to add injuries to, body maps, and current viewed body map
         self.record = None
@@ -69,6 +70,10 @@ class BodyMapInterface(CTkFrame):
         self.injury_type_combobox = CTkComboBox(master=self.injury_edit_frame, values=self.injury_types,
                                                 state="readonly")
         self.injury_type_combobox.set("Injury Type")
+        self.injury_depth_label = CTkLabel(master=self.injury_edit_frame, text="Injury Depth: ")
+        self.injury_depth_combobox = CTkComboBox(master=self.injury_edit_frame, values=self.injury_depth,
+                                                state="readonly")
+        self.injury_depth_combobox.set("Injury Depth")
         self.injury_note_entry = CTkEntry(master=self.injury_edit_frame, placeholder_text="Injury Note (Optional)")
         self.unselect_all_button = CTkButton(master=self.injury_edit_frame, text="Deselect All", state="disabled",
                                              command=self.deselect_all_buttons)
@@ -118,9 +123,11 @@ class BodyMapInterface(CTkFrame):
         self.injury_edit_frame.columnconfigure(2, weight=1)
         self.add_injuries_label.grid(row=0, column=1)
         self.injury_locations_label.grid(row=1, column=0)
-        self.injury_area_label.grid(row=2, column=0)
+        self.injury_area_label.grid(row=3, column=0)
+        self.injury_depth_label.grid(row=2, column=0)
+        self.injury_depth_combobox.grid(row=2, column=1)
         self.injury_type_combobox.grid(row=1, column=1)
-        self.injury_note_entry.grid(row=2, column=1)
+        self.injury_note_entry.grid(row=3, column=1)
         self.unselect_all_button.grid(row=1, column=2)
         self.create_injury_button.grid(row=2, column=2)
         self.injury_error_label.grid(row=3, column=1)
@@ -280,7 +287,7 @@ class BodyMapInterface(CTkFrame):
                                       indices=self.staged_injury_indices,
                                       locations=self.staged_locations,
                                       area=self.calculate_injury_coverage(),
-                                      note=self.injury_note_entry.get())
+                                      note=self.injury_note_entry.get(), injury_depth=self.injury_depth_combobox.get())
 
             for body_map in self.staged_locations:
                 self.body_maps_dict[body_map].add_injuries_deselect_body_map(self.injury_type_combobox.get())
